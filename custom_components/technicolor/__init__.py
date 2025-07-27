@@ -3,10 +3,11 @@ from datetime import timedelta
 
 from .const import DOMAIN
 from homeassistant.config_entries import SOURCE_IMPORT, ConfigEntry
+from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from .router import TechnicolorRouter
 
-PLATFORMS = ["device_tracker"]
+PLATFORMS = [Platform.DEVICE_TRACKER]
 SCAN_INTERVAL = timedelta(seconds=30)
 
 
@@ -45,7 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     technicolor_router = TechnicolorRouter(hass, entry)
     await technicolor_router.setup()
 
-    hass.async_create_task(hass.config_entries.async_forward_entry_setup(entry, "device_tracker"))
+    hass.async_create_task(hass.config_entries.async_forward_entry_setups(entry, PLATFORMS))
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {
         DOMAIN: technicolor_router,

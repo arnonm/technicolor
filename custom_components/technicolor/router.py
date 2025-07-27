@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta
+import asyncio
 
 from technicolorgateway import TechnicolorGateway
 
@@ -22,6 +23,7 @@ class TechnicolorRouter:
     def __init__(self, hass: HomeAssistant, entry: ConfigEntry) -> None:
         """Initialize a Technicolor router."""
         self.hass = hass
+        self.loop = asyncio.get_running_loop()
         self._entry = entry
         self._host = entry.data[CONF_HOST]
         self._user = entry.data[CONF_USERNAME]
@@ -39,7 +41,7 @@ class TechnicolorRouter:
         )
 
         try:
-            await self.hass.async_add_executor_job(self._api.authenticate)
+            await self.loop.run_in_executor(None, self._api.authenticate)
         except Exception as e:
             _LOGGER.exception("Failed to connect to Technicolor", e)
             return ConfigEntryNotReady
@@ -58,7 +60,7 @@ class TechnicolorRouter:
     async def update_device_trackers(self) -> None:
         _LOGGER.info("update_device_trackers")
         new_device = None
-        devices = await self.hass.async_add_executor_job(self._api.get_device_modal)
+        devices = await self.loop.run_in_executor(None, self._api.get_device_modal)
         _LOGGER.info(f"update_device_trackers devices ${devices}")
 
         for device in devices:
