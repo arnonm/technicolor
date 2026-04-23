@@ -21,16 +21,14 @@ async def async_setup(hass, config):
     options = {}
     hass.data[DOMAIN] = {"yaml_options": options}
 
-    # check if already configured
-    domains_list = hass.config_entries.async_domains()
-    if DOMAIN in domains_list:
-        return True
-
-    hass.async_create_task(
-        hass.config_entries.flow.async_init(
-            DOMAIN, context={"source": SOURCE_IMPORT}, data=conf
+    # Support importing one or multiple routers from YAML.
+    conf_list = conf if isinstance(conf, list) else [conf]
+    for router_conf in conf_list:
+        hass.async_create_task(
+            hass.config_entries.flow.async_init(
+                DOMAIN, context={"source": SOURCE_IMPORT}, data=router_conf
+            )
         )
-    )
 
     return True
 

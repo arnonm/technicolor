@@ -27,18 +27,45 @@ _LOGGER = logging.getLogger(__name__)
 
 CONFIG_SCHEMA = vol.Schema(
     {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_HOST): cv.string,
-                vol.Optional(CONF_PORT, default=80): int,
-                vol.Optional(CONF_USE_SSL, default=False): bool,
-                vol.Optional(CONF_VERIFY_SSL, default=True): bool,
-                vol.Required(CONF_USERNAME): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Optional(CONF_DEVICES, default=[]): vol.All(cv.ensure_list, [cv.string]),
-                vol.Optional(CONF_EXCLUDE, default=[]): vol.All(cv.ensure_list, [cv.string]),
-            }
-        ),
+        DOMAIN: vol.Any(
+            vol.Schema(
+                {
+                    vol.Required(CONF_HOST): cv.string,
+                    vol.Optional(CONF_PORT, default=80): int,
+                    vol.Optional(CONF_USE_SSL, default=False): bool,
+                    vol.Optional(CONF_VERIFY_SSL, default=True): bool,
+                    vol.Required(CONF_USERNAME): cv.string,
+                    vol.Required(CONF_PASSWORD): cv.string,
+                    vol.Optional(CONF_DEVICES, default=[]): vol.All(
+                        cv.ensure_list, [cv.string]
+                    ),
+                    vol.Optional(CONF_EXCLUDE, default=[]): vol.All(
+                        cv.ensure_list, [cv.string]
+                    ),
+                }
+            ),
+            vol.All(
+                cv.ensure_list,
+                [
+                    vol.Schema(
+                        {
+                            vol.Required(CONF_HOST): cv.string,
+                            vol.Optional(CONF_PORT, default=80): int,
+                            vol.Optional(CONF_USE_SSL, default=False): bool,
+                            vol.Optional(CONF_VERIFY_SSL, default=True): bool,
+                            vol.Required(CONF_USERNAME): cv.string,
+                            vol.Required(CONF_PASSWORD): cv.string,
+                            vol.Optional(CONF_DEVICES, default=[]): vol.All(
+                                cv.ensure_list, [cv.string]
+                            ),
+                            vol.Optional(CONF_EXCLUDE, default=[]): vol.All(
+                                cv.ensure_list, [cv.string]
+                            ),
+                        }
+                    )
+                ],
+            ),
+        )
     },
     extra=vol.ALLOW_EXTRA,
 )
@@ -105,7 +132,7 @@ class TechnicolorDeviceScanner(ScannerEntity):
     @property
     def unique_id(self) -> str:
         """Return a unique ID."""
-        return self._device['mac']
+        return f"{self._router.entry_id}_{self._device['mac']}"
 
     @property
     def name(self) -> str:

@@ -39,6 +39,14 @@ class TechnicolorRouter:
 
         self.listeners = []
 
+    @property
+    def entry_id(self) -> str:
+        return self._entry.entry_id
+
+    @property
+    def host(self) -> str:
+        return self._host
+
     @staticmethod
     def _get_entry_value(entry: ConfigEntry, key: str, default):
         if key in entry.options:
@@ -99,9 +107,9 @@ class TechnicolorRouter:
     @property
     def signal_device_update(self) -> str:
         """Event specific per Technicolor entry to signal updates in devices."""
-        return f"{DOMAIN}-device-update"
+        return f"{DOMAIN}-{self.entry_id}-device-update"
 
     @property
     def signal_device_new(self) -> str:
         """Event specific per Technicolor entry to signal new device."""
-        return f"{DOMAIN}-device-new"
+        return f"{DOMAIN}-{self.entry_id}-device-new"
