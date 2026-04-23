@@ -66,7 +66,7 @@ class TechnicolorRouter:
             await self.loop.run_in_executor(None, self._api.authenticate)
         except Exception:
             _LOGGER.exception("Failed to connect to Technicolor")
-            return ConfigEntryNotReady
+            raise ConfigEntryNotReady
 
         await self.update_all(None)
 
